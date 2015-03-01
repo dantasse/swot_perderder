@@ -65,6 +65,10 @@ if __name__ == '__main__':
         syllables = line.split('  ')[1].strip().split(' ')
         pronounce[word] = syllables
 
+    # TODO connect to twitter to post
+    # TODO pick out images, store locally I guess
+    # TODO programmatically generate memes
+    # TODO watermark memes
     for food in random.sample(foods, 10):
         print food
         for foodword in food.split(' '):

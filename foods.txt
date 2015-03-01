@@ -22,6 +22,7 @@ beef burger
 beet
 bell pepper
 berry
+birthday cake
 biscuit
 black beans
 blackberry
@@ -69,6 +70,7 @@ cheese pizza
 cheesecake
 cherry
 chicken
+chicken and waffles
 chick peas
 chili
 chips
@@ -93,7 +95,9 @@ collard greens
 cookie
 cookie dough
 corn
+corn bread
 corn flakes
+corn on the cob
 cornmeal
 cottage cheese
 crab
