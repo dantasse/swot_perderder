@@ -3,8 +3,17 @@
 # Every so often (TBD), takes a food, messes its name up, grabs an image of
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
-import argparse, random
+import argparse, random, ConfigParser
 from collections import defaultdict
+import oauth2 as oauth
+
+config = ConfigParser.ConfigParser()
+config.read('config.txt')
+POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
+OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
+              'consumer_secret': config.get('twitter', 'consumer_secret'),
+              'access_token_key': config.get('twitter', 'access_token_key'),
+              'access_token_secret': config.get('twitter', 'access_token_secret')}
 
 # Lookup table to translate phones to letters.
 phone_lookup = {
@@ -59,12 +68,39 @@ def get_letter(phone):
         possible_letters.extend(possible_letters[0:i])
     return random.sample(possible_letters, 1)[0]
 
+# Returns a misspelled (but sort of pronounced the same) version of the food.
+def misspell(food):
+    fud = []
+    for foodword in food.split(' '):
+        letters = ''
+        for phone in pronounce[foodword.upper()]:
+            letters += get_letter(phone)
+        fud.append(letters)
+    return ' '.join(fud)
+
+# Given a correctly-spelled word and a made-up spelling, returns a meme.
+def make_image(food, fud):
+    return # TODO
+
+# Sends an actual request to Twitter, with authentication.
+# Note! It sends an actual request to Twitter!
+def oauth_req(url, http_method="GET", post_body=None, http_headers=None):
+    consumer = oauth.Consumer(key=OAUTH_KEYS['consumer_key'], secret=OAUTH_KEYS['consumer_secret'])
+    token = oauth.Token(key=OAUTH_KEYS['access_token_key'], secret=OAUTH_KEYS['access_token_secret'])
+    client = oauth.Client(consumer, token)
+    if http_method == "POST":
+        resp, content = client.request(url, method=http_method, body=post_body, headers=http_headers)
+    else:
+        resp, content = client.request(url, method=http_method, headers=http_headers)
+    return (resp, content)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--foods_file', default='foods.txt')
     parser.add_argument('--pronouncing_dict_file',
         default='cmu_pronouncing_dict/cmudict-0.7b.txt')
     args = parser.parse_args()
+
 
     # Parse food list and pronunciation dictionary
     foods = [line.strip() for line in open(args.foods_file)]
@@ -78,14 +114,9 @@ if __name__ == '__main__':
     not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
     print 'unpronounced: ' + str(not_pronounced_words)
 
-    # TODO connect to twitter to post
-    # TODO pick out images, store locally I guess
-    # TODO programmatically generate memes
-    # TODO watermark memes
-    for food in random.sample(foods, 10):
+    for food in random.sample(foods, 1):
         print food
-        for foodword in food.split(' '):
-            letters = ''
-            for phone in pronounce[foodword.upper()]:
-                letters += get_letter(phone)
-            print letters
+        fud = misspell(food)
+        print fud
+        # image = make_image(food, fud) # TODO
+        # post to twitter # TODO
