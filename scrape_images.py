@@ -9,6 +9,7 @@
 
 import urllib2, json, requests, argparse, csv, time, base64, os
 
+
 def get_image_urls_for_food(food):
     params = {'v': 1.0, 'q': food}
     r = requests.get('https://ajax.googleapis.com/ajax/services/search/images',
@@ -39,10 +40,17 @@ if __name__ == '__main__':
         urls = get_image_urls_for_food(food)
         for url in urls:
             filename = get_filename(food, url)
+
+            try:
+                image_data = requests.get(url).content
+            except requests.exceptions.SSLError:
+                print "SSL error on %s" % url
+                continue
+            except requests.exceptions.ConnectionError:
+                print "Connection error on %s" % url
+                continue
+
             food_image_urls.writerow([food, url, filename])
-
-            image_data = requests.get(url).content
-
             writer = open(args.images_dir + os.sep + filename, 'w')
             writer.write(image_data)
             writer.close()
