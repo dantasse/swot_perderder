@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 
 # Scrapes Google Image Search I guess for images of food.
 
@@ -31,10 +31,11 @@ if __name__ == '__main__':
 
     foods = [food.strip().lower() for food in open(args.foods_file)]
     food_image_urls = csv.writer(open(args.food_image_urls_file, 'w'))
-    food_image_urls.writerow(['food', 'url'])
+    food_image_urls.writerow(['food', 'url', 'filename'])
     for food in foods:
         if args.start_at and food < args.start_at:
             continue
+        print 'Getting images for: ' + food
         urls = get_image_urls_for_food(food)
         for url in urls:
             filename = get_filename(food, url)
