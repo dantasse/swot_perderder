@@ -6,38 +6,39 @@
 import argparse, random
 from collections import defaultdict
 
-syllable_lookup = {
+# Lookup table to translate phones to letters.
+phone_lookup = {
     'AA':['AH', 'AW', 'AR', 'ER', 'OH'],
-    'AE':['AA', 'EH', 'AH', 'A'],
+    'AE':['A', 'AA', 'EH', 'AH'],
     'AH':['AH', 'EH', 'OH', 'UH', 'AR'],
     'AO':['AW', 'OH', 'UH'],
-    'AW':['OW', 'AYOW', 'OO'],
+    'AW':['OW', 'OO', 'AW'],
     'AY':['I', 'IE', 'AY'],
-    'B': ['B', 'P'],
-    'CH':['CH', 'SH', 'ZH'],
-    'D': ['D', 'TH'],
+    'B': ['B', 'P', 'D'],
+    'CH':['CH', 'SH', 'K'],
+    'D': ['D', 'T', 'TH'],
     'DH':['DH', 'TH'],
-    'EH':['E', 'ER', 'EH', 'I', 'O'],
+    'EH':['E', 'UH', 'ER', 'EH', 'I', 'O'],
     'ER':['ER', 'AR', 'OR'],
     'EY':['A', 'AE', 'EY'],
     'F': ['F', 'V'],
-    'G': ['G', 'GH'],
-    'HH':['H', 'CH'],
-    'IH':['I', 'IH', 'YI'],
-    'IY':['I', 'AY', 'YI'],
+    'G': ['G', 'G', 'GH'],
+    'HH':['H', 'H', 'CH'],
+    'IH':['I', 'A', 'UH'],
+    'IY':['I', 'EE', 'AY'],
     'JH':['J', 'G', 'Z'],
     'K': ['K', 'C'],
-    'L': ['L', 'LL'],
+    'L': ['L', 'L', 'LL'],
     'M': ['M', 'N'],
     'N': ['N', 'M'],
     'NG':['NG', 'N', 'NN'],
-    'OW':['OH', 'O', 'OW', 'YO'],
+    'OW':['O', 'OH', 'OW', 'YO'],
     'OY':['OY', 'OI', 'UI'],
     'P': ['P', 'B'],
-    'R': ['R', 'RR'],
-    'S': ['S', 'SH', 'Z'],
-    'SH':['SH', 'CH', 'ZH'],
-    'T': ['T', 'TH', 'D'],
+    'R': ['R'],
+    'S': ['S', 'S', 'SH', 'Z', 'Z'],
+    'SH':['SH', 'CH'],
+    'T': ['T', 'D', 'TH'],
     'TH':['TH', 'T', 'D'],
     'UH':['OO', 'UH', 'OU'],
     'UW':['OO', 'U', 'UE'],
@@ -48,6 +49,16 @@ syllable_lookup = {
     'ZH':['ZH', 'SH', 'CH'],
 }
 
+# Given a phone (like "IY2" or "HH") returns letters that might somehow
+# represent it in a word, in a goofy sort of way.
+def get_letter(phone):
+    phone = phone.strip('012') # Ignore stresses, at least for now.
+    possible_letters = phone_lookup[phone][:] # Slice to copy.
+    # Copy early letters to make them more likely.
+    for i in range(len(possible_letters)):
+        possible_letters.extend(possible_letters[0:i])
+    return random.sample(possible_letters, 1)[0]
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--foods_file', default='foods.txt')
@@ -57,13 +68,15 @@ if __name__ == '__main__':
 
     # Parse food list and pronunciation dictionary
     foods = [line.strip() for line in open(args.foods_file)]
-    pronounce = defaultdict(list) # word -> list of pronunciations, each a list of syllables.
+    pronounce = defaultdict(list) # word -> list of pronunciations, each a list of phones.
     for line in open(args.pronouncing_dict_file):
         if line.startswith(';'):
             continue
         word = line.split('  ')[0]
-        syllables = line.split('  ')[1].strip().split(' ')
-        pronounce[word] = syllables
+        pronounce[word] = line.split('  ')[1].strip().split(' ')
+
+    not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
+    print 'unpronounced: ' + str(not_pronounced_words)
 
     # TODO connect to twitter to post
     # TODO pick out images, store locally I guess
@@ -73,11 +86,6 @@ if __name__ == '__main__':
         print food
         for foodword in food.split(' '):
             letters = ''
-            for syllable in pronounce[foodword.upper()]:
-                syllable = syllable.strip('01234')
-                possible_letters = syllable_lookup[syllable][:] # slice to copy
-                # copy early letters to make them more likely.
-                for i in range(len(possible_letters)):
-                    possible_letters.extend(possible_letters[0:i])
-                letters += random.sample(possible_letters, 1)[0]
+            for phone in pronounce[foodword.upper()]:
+                letters += get_letter(phone)
             print letters

@@ -2,16 +2,18 @@ acorn squash
 alfalfa sprouts
 almond
 anchovy
-anise
 apple
+apple crisp
 apricot
 artichoke
 asparagus
 aspic
 avocado
 bacon
+bacon double cheeseburger
 bagel
 baked Alaska
+baked potato
 bamboo shoots
 banana
 barbecue
@@ -19,11 +21,13 @@ barley
 basil
 bean curd
 beef burger
+beef stew
 beet
 bell pepper
 berry
 birthday cake
 biscuit
+biscuits and gravy
 black beans
 blackberry
 black eyed peas
@@ -46,7 +50,6 @@ burrito
 butter
 butter bean
 cake
-calorie
 candy
 candy apple
 cantaloupe
@@ -55,6 +58,7 @@ cappuccino
 caramel
 caramel apple
 carrot
+carrot cake
 cashew
 cassava
 casserole
@@ -63,9 +67,11 @@ caviar
 cayenne pepper
 celery
 cereal
-chard
+cereal and milk
 cheddar
+cheddar cheese
 cheese
+cheeseburger
 cheese pizza
 cheesecake
 cherry
@@ -104,12 +110,13 @@ crab
 crab cakes
 crackers
 cranberry
+cranberry sauce
 cream
 cream cheese
 crepe
-crisp
+crouton
+croissant
 crunch
-crust
 cucumber
 cupcake
 curds
@@ -134,20 +141,23 @@ endive
 everything bagel
 falafel
 fava beans
-feast
 fennel
 filet mignon
 fillet
 fish
+fish and chips
 flan
 flour
-food
 French fries
-fried
+fried eggs
+fried rice
 fritter
 frosting
 fruit
+fruit punch
+fruit salad
 garlic
+garlic bread
 gelatin
 gelato
 ginger
@@ -155,7 +165,6 @@ ginger ale
 gingerbread
 Gouda cheese
 goulash
-grain
 granola
 grape
 grapefruit
@@ -166,14 +175,14 @@ green tea
 grilled cheese
 guacamole
 guava
+gumbo
 gyro
 herbs
 halibut
 ham
 hamburger
-hash
+hash browns
 hazelnut
-herbs
 honey
 honeydew
 horseradish
@@ -185,9 +194,11 @@ iced tea
 icing
 ice cream
 ice cream cone
+ice cream sandwich
 jackfruit
 jalapeno
 jam
+jambalaya
 jelly
 jelly beans
 jicama
@@ -224,7 +235,7 @@ loquat
 lox
 lunch meat
 lychee
-macademia nut
+macadamia nut
 macaroni
 macaroon
 maize
@@ -240,6 +251,7 @@ mashed potatoes
 mayonnaise
 meat
 meatball
+meatball sub
 meatloaf
 melon
 meringue
@@ -259,10 +271,8 @@ mussels
 mustard
 mustard greens
 mutton
-napkin
 nectar
 nectarine
-nibble
 noodles
 nutmeg
 oats
@@ -273,9 +283,7 @@ omelet
 onion
 orange
 orange juice
-order
 oregano
-oven
 oyster
 pancake
 papaya
@@ -298,7 +306,6 @@ pepperoni
 pepperoni pizza
 persimmon
 pickle
-picnic
 pie
 pierogi
 pilaf
@@ -313,8 +320,10 @@ popsicle
 popcorn
 popovers
 pork
+pork and beans
 pork chops
 potato
+potato chips
 pot roast
 preserves
 pretzel
@@ -324,7 +333,6 @@ pudding
 pumpernickel
 pumpkin
 pumpkin pie
-punch
 quiche
 quinoa
 radish
@@ -340,8 +348,6 @@ roll
 romaine
 rosemary
 rye bread
-saffron
-sage
 salad
 salami
 salmon
@@ -351,22 +357,19 @@ sandwich
 sauce
 sauerkraut
 sausage
-savory
 scallops
-scrambled
+scrambled eggs
 seaweed
 seeds
 sesame seed
 shallots
 sherbet
+shepherds pie
 shish kebab
 shrimp
 soda
 soda bread
-sole
 sorbet
-sorghum
-sorrel
 soup
 sour cream
 soybeans
@@ -395,8 +398,7 @@ sugar
 sugar snap peas
 summer squash
 sundae
-sunflower
-supper
+sunflower seeds
 sushi
 sweet potato
 Swiss chard
@@ -408,9 +410,8 @@ tapioca
 taro
 tart
 tea
-teapot
 teriyaki
-thyme
+tiramisu
 toast
 toffee
 tofu
@@ -428,12 +429,10 @@ vanilla
 veal
 vegetables
 venison
-vinegar
 wafer
 waffle
 walnut
 wasabi
-water
 water chestnut
 watercress
 watermelon
@@ -441,7 +440,6 @@ wheat
 whey
 whipped cream
 yam
-yeast
 yogurt
 yolk
 zucchini
