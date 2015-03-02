@@ -48,7 +48,6 @@ Brussels sprouts
 buckwheat
 burrito
 butter
-butter bean
 cake
 candy
 candy apple
@@ -84,7 +83,6 @@ chives
 chocolate
 chocolate chips
 chocolate chip cookie
-chopsticks
 chutney
 cilantro
 cinnamon
@@ -208,13 +206,11 @@ junk food
 kale
 kebab
 ketchup
-kettle
 kettle corn
 kidney beans
 kiwi
 kohlrabi
 kumquat
-lamb
 lard
 lasagna
 legumes
@@ -259,7 +255,6 @@ milk
 milkshake
 millet
 mincemeat
-minerals
 mint
 mints
 mochi
@@ -271,7 +266,6 @@ mussels
 mustard
 mustard greens
 mutton
-nectar
 nectarine
 noodles
 nutmeg
@@ -292,7 +286,6 @@ parsnip
 pasta
 pastry
 pate
-patty
 patty pan squash
 peach
 peanut
@@ -359,7 +352,6 @@ sauerkraut
 sausage
 scallops
 scrambled eggs
-seaweed
 seeds
 sesame seed
 shallots
@@ -377,14 +369,12 @@ soy sauce
 spaghetti
 spanakopita
 spare ribs
-spatula
 spices
 spinach
 split peas
 sprinkles
 sprouts
 squash
-squid
 steak
 stew
 stir fry
