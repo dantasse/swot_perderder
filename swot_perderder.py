@@ -89,10 +89,10 @@ def misspell(food):
 # Given a correctly-spelled word and a made-up spelling, returns a meme image.
 def make_image(food, fud):
     foodlower = food.lower().replace(' ', '_')
-    possible_files = [f for f in os.listdir('images') if '_'.join(f.split('_')[:-1]) == foodlower]
+    possible_files = [f for f in os.listdir(args.images_dir) if '_'.join(f.split('_')[:-1]) == foodlower]
 
     # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
-    img = Image.open('images' + os.sep + random.sample(possible_files, 1)[0])
+    img = Image.open(args.images_dir + os.sep + random.sample(possible_files, 1)[0])
 
     # find biggest font size that works
     fontSize = img.size[1]/5
@@ -147,6 +147,7 @@ def post_tweet(image):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--foods_file', default='foods.txt')
+    parser.add_argument('--images_dir', default='images')
     parser.add_argument('--pronouncing_dict_file',
         default='cmu_pronouncing_dict/cmudict-0.7b.txt')
     args = parser.parse_args()
