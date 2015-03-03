@@ -3,10 +3,10 @@
 # Every so often (TBD), takes a food, messes its name up, grabs an image of
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
-import argparse, random, ConfigParser, os, PIL
+import argparse, random, ConfigParser, os, PIL, StringIO, time
 from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
-import oauth2 as oauth
+from twython import Twython
 
 config = ConfigParser.ConfigParser()
 config.read('config.txt')
@@ -17,7 +17,8 @@ OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
               'access_token_secret': config.get('twitter', 'access_token_secret')}
 
 IMPACT = "Impact.ttf"
-BASKERVILLE = "Baskerville.ttc"
+twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
+    OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
 
 # Lookup table to translate phones to letters.
 phone_lookup = {
@@ -33,7 +34,7 @@ phone_lookup = {
     'DH':['DH', 'TH'],
     'EH':['E', 'UH', 'ER', 'EH', 'I', 'O'],
     'ER':['ER', 'AR', 'OR'],
-    'EY':['A', 'AE', 'EY'],
+    'EY':['A', 'A', 'EY'],
     'F': ['F', 'V'],
     'G': ['G', 'G', 'GH'],
     'HH':['H', 'H', 'CH'],
@@ -91,24 +92,30 @@ def make_image(food, fud):
     possible_files = [f for f in os.listdir('images') if '_'.join(f.split('_')[:-1]) == foodlower]
 
     # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
-    img = Image.open('images' + os.sep + random.sample(possible_files, 1)[0]).convert('RGBA')
-    imageSize = img.size
+    img = Image.open('images' + os.sep + random.sample(possible_files, 1)[0])
 
     # find biggest font size that works
-    fontSize = imageSize[1]/5
+    fontSize = img.size[1]/5
     font = ImageFont.truetype(IMPACT, fontSize)
     fudSize = font.getsize(fud)
-    while fudSize[0] > imageSize[0]-20:
+    while fudSize[0] > img.size[0]-20:
         fontSize = fontSize - 1
         font = ImageFont.truetype(IMPACT, fontSize)
         fudSize = font.getsize(fud)
 
-    fudPositionX = (imageSize[0]/2) - (fudSize[0]/2)
-    # nah, forget it, let's try it with just text always on the bottom.
-    # if random.random() < .5:
-    #     fudPositionY = 0
-    # else:
-    fudPositionY = imageSize[1] - fudSize[1]*1.2
+    fudPositionX = (img.size[0]/2) - (fudSize[0]/2)
+    
+    # We want the text to be visible when you first see it in the twitter
+    # stream. That means, if the image is taller than 2:1, you have to make
+    # sure to position the text within the center 2:1 rectangle.
+    # ... though this doesn't even work, b/c different clients display it differently. TODO fix.
+    height = img.size[1]
+    width = img.size[0]
+    if height > width/2:
+        innerBoxTop = height/2 + .5 * width/2
+        fudPositionY = innerBoxTop - fudSize[1]*1.1
+    else:
+        fudPositionY = img.size[1] - fudSize[1]*1.2
     fudPosition = (fudPositionX, fudPositionY)
 
     draw = ImageDraw.Draw(img)
@@ -129,17 +136,13 @@ def make_image(food, fud):
     img.save("temp.png")
     return img
 
-# Sends an actual request to Twitter, with authentication.
-# Note! It sends an actual request to Twitter!
-def oauth_req(url, http_method="GET", post_body=None, http_headers=None):
-    consumer = oauth.Consumer(key=OAUTH_KEYS['consumer_key'], secret=OAUTH_KEYS['consumer_secret'])
-    token = oauth.Token(key=OAUTH_KEYS['access_token_key'], secret=OAUTH_KEYS['access_token_secret'])
-    client = oauth.Client(consumer, token)
-    if http_method == "POST":
-        resp, content = client.request(url, method=http_method, body=post_body, headers=http_headers)
-    else:
-        resp, content = client.request(url, method=http_method, headers=http_headers)
-    return (resp, content)
+def post_tweet(image):
+    image_io = StringIO.StringIO()
+    image.save(image_io, format='JPEG')
+    # If you do not seek(0), the image will be at the end of the file and unable to be read
+    image_io.seek(0)
+    # TODO update this to use upload_media and then a separate post instead.
+    twitter.update_status_with_media(media=image_io, status='')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -147,7 +150,6 @@ if __name__ == '__main__':
     parser.add_argument('--pronouncing_dict_file',
         default='cmu_pronouncing_dict/cmudict-0.7b.txt')
     args = parser.parse_args()
-
 
     # Parse food list and pronunciation dictionary
     foods = [line.strip() for line in open(args.foods_file)]
@@ -159,13 +161,16 @@ if __name__ == '__main__':
         pronounce[word] = line.split('  ')[1].strip().split(' ')
 
     not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
-    print 'unpronounced: ' + str(not_pronounced_words)
+    if len(not_pronounced_words) > 0:
+        print 'Warning! These words are unpronounced: ' + str(not_pronounced_words)
 
-    for food in random.sample(foods, 1):
-        print food
+    while True:
+        food = random.sample(foods, 1)[0]
         fud = misspell(food)
-        print fud
-        image = make_image(food, fud) # TODO
-        # post to twitter # TODO
-        # sleep random number of minutes/hours
-        # resize all images too
+        image = make_image(food, fud)
+        print "Posting %s as %s" % (food, fud)
+        post_tweet(image)
+        # post ~ 3 per day? Average sleep = 8 hours, so 480 min.
+        minutes_to_sleep = random.randint(280, 680)
+        print "Sleeping for %d hours, %d minutes" % (minutes_to_sleep / 60, minutes_to_sleep % 60)
+        time.sleep(minutes_to_sleep * 60)
