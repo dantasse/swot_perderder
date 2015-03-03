@@ -11,7 +11,7 @@ import urllib2, json, requests, argparse, csv, time, base64, os
 
 
 def get_image_urls_for_food(food):
-    params = {'v': 1.0, 'q': food}
+    params = {'v': 1.0, 'imgsz': 'large', 'rsz':6, 'as_filetype':'jpg', 'q': food}
     r = requests.get('https://ajax.googleapis.com/ajax/services/search/images',
             params=params)
     urls = [result['unescapedUrl'] for result in r.json()['responseData']['results']]
@@ -20,7 +20,7 @@ def get_image_urls_for_food(food):
 # Get a filename for a food image that is located at the following URL.
 def get_filename(food, url):
     url_after_http = url[10:]
-    return food.replace(' ', '_') + '_' + base64.b64encode(url_after_http)[0:8] + ".png"
+    return food.replace(' ', '_') + '_' + base64.b64encode(url_after_http)[0:8] + ".jpg"
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -48,6 +48,12 @@ if __name__ == '__main__':
                 continue
             except requests.exceptions.ConnectionError:
                 print "Connection error on %s" % url
+                continue
+            except requests.exceptions.TooManyRedirects:
+                print "Too many redirects on %s" % url
+                continue
+            except:
+                print "Some other error getting an image at %s" % url
                 continue
 
             food_image_urls.writerow([food, url, filename])
