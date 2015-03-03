@@ -70,8 +70,8 @@ cereal and milk
 cheddar
 cheddar cheese
 cheese
-cheeseburger
 cheese pizza
+cheeseburger
 cheesecake
 cherry
 chicken
@@ -398,7 +398,6 @@ tamale
 tangerine
 tapioca
 taro
-tart
 tea
 teriyaki
 tiramisu
