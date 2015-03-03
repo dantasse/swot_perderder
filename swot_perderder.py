@@ -3,7 +3,8 @@
 # Every so often (TBD), takes a food, messes its name up, grabs an image of
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
-import argparse, random, ConfigParser
+import argparse, random, ConfigParser, os, PIL
+from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 import oauth2 as oauth
 
@@ -14,6 +15,9 @@ OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
               'consumer_secret': config.get('twitter', 'consumer_secret'),
               'access_token_key': config.get('twitter', 'access_token_key'),
               'access_token_secret': config.get('twitter', 'access_token_secret')}
+
+IMPACT = "Impact.ttf"
+BASKERVILLE = "Baskerville.ttc"
 
 # Lookup table to translate phones to letters.
 phone_lookup = {
@@ -74,13 +78,56 @@ def misspell(food):
     for foodword in food.split(' '):
         letters = ''
         for phone in pronounce[foodword.upper()]:
+            if phone.endswith('0') and not phone.startswith('ER') and random.random() < .25:
+                continue # skip 25% of unstressed vowels, funnier that way.
+                # but don't skip ERs, they are important. and usually funny.
             letters += get_letter(phone)
         fud.append(letters)
     return ' '.join(fud)
 
-# Given a correctly-spelled word and a made-up spelling, returns a meme.
+# Given a correctly-spelled word and a made-up spelling, returns a meme image.
 def make_image(food, fud):
-    return # TODO
+    foodlower = food.lower().replace(' ', '_')
+    possible_files = [f for f in os.listdir('images') if '_'.join(f.split('_')[:-1]) == foodlower]
+
+    # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
+    img = Image.open('images' + os.sep + random.sample(possible_files, 1)[0]).convert('RGBA')
+    imageSize = img.size
+
+    # find biggest font size that works
+    fontSize = imageSize[1]/5
+    font = ImageFont.truetype(IMPACT, fontSize)
+    fudSize = font.getsize(fud)
+    while fudSize[0] > imageSize[0]-20:
+        fontSize = fontSize - 1
+        font = ImageFont.truetype(IMPACT, fontSize)
+        fudSize = font.getsize(fud)
+
+    fudPositionX = (imageSize[0]/2) - (fudSize[0]/2)
+    # nah, forget it, let's try it with just text always on the bottom.
+    # if random.random() < .5:
+    #     fudPositionY = 0
+    # else:
+    fudPositionY = imageSize[1] - fudSize[1]*1.2
+    fudPosition = (fudPositionX, fudPositionY)
+
+    draw = ImageDraw.Draw(img)
+    
+    # draw outlines - this is kind of slow, there may be a better way
+    outlineRange = fontSize/15
+    for x in range(-outlineRange, outlineRange+1, 2):
+        for y in range(-outlineRange, outlineRange+1, 2):
+            draw.text((fudPosition[0]+x, fudPosition[1]+y), fud, (0,0,0), font=font)
+
+    draw.text(fudPosition, fud, (255,255,255), font=font)
+
+    # half ass watermark :P TODO make this better
+    watermarkFontSize = fontSize / 5
+    watermarkFont = ImageFont.truetype(IMPACT, watermarkFontSize)
+    draw.text((5, 5), "@swot_perderder", fill=(200, 200, 200), font=watermarkFont)
+
+    img.save("temp.png")
+    return img
 
 # Sends an actual request to Twitter, with authentication.
 # Note! It sends an actual request to Twitter!
@@ -118,5 +165,7 @@ if __name__ == '__main__':
         print food
         fud = misspell(food)
         print fud
-        # image = make_image(food, fud) # TODO
+        image = make_image(food, fud) # TODO
         # post to twitter # TODO
+        # sleep random number of minutes/hours
+        # resize all images too
