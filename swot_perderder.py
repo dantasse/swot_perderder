@@ -89,8 +89,9 @@ def misspell(food):
 # Given a correctly-spelled word and a made-up spelling, returns a meme image.
 def make_image(food, fud):
     foodlower = food.lower().replace(' ', '_')
+    print foodlower
     possible_files = [f for f in os.listdir(args.images_dir) if '_'.join(f.split('_')[:-1]) == foodlower]
-
+    print possible_files
     # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
     img = Image.open(args.images_dir + os.sep + random.sample(possible_files, 1)[0])
 
@@ -136,13 +137,14 @@ def make_image(food, fud):
     img.save("temp.png")
     return img
 
-def post_tweet(image):
+def post_tweet(image, fud):
     image_io = StringIO.StringIO()
     image.save(image_io, format='JPEG')
     # If you do not seek(0), the image will be at the end of the file and unable to be read
     image_io.seek(0)
     # TODO update this to use upload_media and then a separate post instead.
     twitter.update_status_with_media(media=image_io, status='')
+    # twitter.update_status_with_media(media=image_io, status='#' + fud.lower().replace(' ', '_'))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -170,8 +172,8 @@ if __name__ == '__main__':
         fud = misspell(food)
         image = make_image(food, fud)
         print "Posting %s as %s" % (food, fud)
-        post_tweet(image)
-        # post ~ 3 per day? Average sleep = 8 hours, so 480 min.
+        post_tweet(image, fud)
+        # post ~ 3 per day? Average sleep = 480 min.
         minutes_to_sleep = random.randint(280, 680)
         print "Sleeping for %d hours, %d minutes" % (minutes_to_sleep / 60, minutes_to_sleep % 60)
         time.sleep(minutes_to_sleep * 60)
