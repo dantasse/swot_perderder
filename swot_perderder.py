@@ -3,10 +3,11 @@
 # Every so often (TBD), takes a food, messes its name up, grabs an image of
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
-import argparse, random, ConfigParser, os, PIL, StringIO, time
+import argparse, random, ConfigParser, os, PIL, StringIO, time, datetime
 from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 from twython import Twython
+import twython.exceptions
 
 config = ConfigParser.ConfigParser()
 config.read('config.txt')
@@ -172,8 +173,16 @@ if __name__ == '__main__':
         fud = misspell(food)
         image = make_image(food, fud)
         print "Posting %s as %s" % (food, fud)
-        post_tweet(image, fud)
-        # post ~ 3 per day? Average sleep = 480 min.
-        minutes_to_sleep = random.randint(280, 680)
-        print "Sleeping for %d hours, %d minutes" % (minutes_to_sleep / 60, minutes_to_sleep % 60)
+        try:
+            post_tweet(image, fud)
+        except twython.exceptions.TwythonError:
+            print "Error once, trying again."
+            try:
+                post_tweet(image, fud)
+            except:
+                print "Error twice, giving up for now."
+ 
+        # post ~ 4 per day? Average sleep = 360 min.
+        minutes_to_sleep = random.randint(260, 460)
+        print "It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60)
         time.sleep(minutes_to_sleep * 60)
