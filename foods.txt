@@ -82,6 +82,7 @@ cherry
 chicken
 chicken tikka masala
 chicken and waffles
+chicken wings
 chick peas
 chili
 chili dog
@@ -187,6 +188,7 @@ green pepper
 greens
 green tea
 grilled cheese
+grits
 guacamole
 guava
 gumbo
@@ -311,6 +313,7 @@ pasta
 pastry
 pate
 patty pan squash
+pawpaw
 peach
 peanut
 peanut brittle

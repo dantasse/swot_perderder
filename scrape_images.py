@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 # Scrapes Google Image Search I guess for images of food.
+#
+# Usage:
+# ./scrape_images.py --food_image_urls_file=(output file for food image urls)
 
 # https://developers.google.com/image-search/v1/jsondevguide#json_snippets_python
 # If this gets rate limited, we can always do:
@@ -25,8 +28,8 @@ def get_filename(food, url):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--foods_file', default='foods.txt')
-    parser.add_argument('--food_image_urls_file', default='food_image_urls.txt')
-    parser.add_argument('--images_dir', default='images')
+    parser.add_argument('--food_image_urls_file', default='food_image_urls.txt', help="output file so we can save the urls and credit where credit's due.")
+    parser.add_argument('--images_dir', default='images', help="output directory to store the images in.")
     parser.add_argument('--start_at', help='if you want to skip some foods, then enter here a name of a food that will be the first one not skipped. (for example, if this process got interrupted before.)')
     args = parser.parse_args()
 
