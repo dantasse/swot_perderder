@@ -30,7 +30,6 @@ biscotti
 biscuit
 biscuits and gravy
 black beans
-black eyed peas
 black tea
 blood orange
 blueberry
@@ -182,7 +181,6 @@ goulash
 granola
 granola bar
 grape
-grape leaves
 grapefruit
 gravy
 green beans
@@ -249,7 +247,6 @@ licorice
 lima beans
 lime
 lingonberry jam
-liver
 liver and onions
 loaf
 lobster
