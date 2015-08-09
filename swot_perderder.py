@@ -182,7 +182,7 @@ if __name__ == '__main__':
             except:
                 print "Error twice, giving up for now."
  
-        # post ~ 4 per day? Average sleep = 360 min.
-        minutes_to_sleep = random.randint(260, 460)
+        # post ~ 2 / day? Average sleep 11 hrs so it'll rotate through the day.
+        minutes_to_sleep = random.randint(460, 860)
         print "It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60)
         time.sleep(minutes_to_sleep * 60)
