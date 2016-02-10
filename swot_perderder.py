@@ -8,19 +8,6 @@ from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 from twython import Twython
 import twython.exceptions
-
-config = ConfigParser.ConfigParser()
-config.read('config.txt')
-POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
-OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
-              'consumer_secret': config.get('twitter', 'consumer_secret'),
-              'access_token_key': config.get('twitter', 'access_token_key'),
-              'access_token_secret': config.get('twitter', 'access_token_secret')}
-
-IMPACT = "Impact.ttf"
-twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
-    OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
-
 # Lookup table to translate phones to letters.
 phone_lookup = {
     'AA':['AH', 'AW', 'AR', 'ER', 'OH'],
@@ -154,6 +141,19 @@ if __name__ == '__main__':
     parser.add_argument('--pronouncing_dict_file',
         default='cmu_pronouncing_dict/cmudict-0.7b.txt')
     args = parser.parse_args()
+
+    config = ConfigParser.ConfigParser()
+    config.read('config.txt')
+    POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
+    OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
+                  'consumer_secret': config.get('twitter', 'consumer_secret'),
+                  'access_token_key': config.get('twitter', 'access_token_key'),
+                  'access_token_secret': config.get('twitter', 'access_token_secret')}
+
+    IMPACT = "Impact.ttf"
+    twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
+        OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
+
 
     # Parse food list and pronunciation dictionary
     foods = [line.strip() for line in open(args.foods_file)]
