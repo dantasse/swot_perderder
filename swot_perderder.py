@@ -75,11 +75,11 @@ def get_letter(phone):
     return random.sample(possible_letters, 1)[0]
 
 # Returns a misspelled (but sort of pronounced the same) version of the food.
-def misspell(food):
+def misspell(pronounce_dict, food):
     fud = []
     for foodword in food.split(' '):
         letters = ''
-        for phone in pronounce[foodword.upper()]:
+        for phone in pronounce_dict[foodword.upper()]:
             if phone.endswith('0') and not phone.startswith('ER') and random.random() < .25:
                 continue # skip 25% of unstressed vowels, funnier that way.
                 # but don't skip ERs, they are important. and usually funny.
@@ -147,6 +147,19 @@ def post_tweet(image, fud):
     twitter.update_status_with_media(media=image_io, status='')
     # twitter.update_status_with_media(media=image_io, status='#' + fud.lower().replace(' ', '_'))
 
+def load_pronouncing_dict(pronouncing_dict_file):
+    pronounce = defaultdict(list) # word -> list of pronunciations, each a list of phones.
+    for line in open(pronouncing_dict_file):
+        if line.startswith(';'):
+            continue
+        word = line.split('  ')[0]
+        pronounce[word] = line.split('  ')[1].strip().split(' ')
+    return pronounce
+
+def quick_pronounce(word):
+    pronounce_temp = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
+    print misspell(pronounce_temp, word)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--foods_file', default='foods.txt')
@@ -157,12 +170,7 @@ if __name__ == '__main__':
 
     # Parse food list and pronunciation dictionary
     foods = [line.strip() for line in open(args.foods_file)]
-    pronounce = defaultdict(list) # word -> list of pronunciations, each a list of phones.
-    for line in open(args.pronouncing_dict_file):
-        if line.startswith(';'):
-            continue
-        word = line.split('  ')[0]
-        pronounce[word] = line.split('  ')[1].strip().split(' ')
+    pronounce = load_pronouncing_dict(args.pronouncing_dict_file)
 
     not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
     if len(not_pronounced_words) > 0:
@@ -170,7 +178,7 @@ if __name__ == '__main__':
 
     while True:
         food = random.sample(foods, 1)[0]
-        fud = misspell(food)
+        fud = misspell(pronounce, food)
         image = make_image(food, fud)
         print "Posting %s as %s" % (food, fud)
         try:
