@@ -77,9 +77,9 @@ def misspell(pronounce_dict, food):
 # Given a correctly-spelled word and a made-up spelling, returns a meme image.
 def make_image(food, fud):
     foodlower = food.lower().replace(' ', '_')
-    print foodlower
+    print(foodlower)
     possible_files = [f for f in os.listdir(args.images_dir) if '_'.join(f.split('_')[:-1]) == foodlower]
-    print possible_files
+    print(possible_files)
     # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
     img = Image.open(args.images_dir + os.sep + random.sample(possible_files, 1)[0])
 
@@ -145,7 +145,7 @@ def load_pronouncing_dict(pronouncing_dict_file):
 
 def quick_pronounce(word):
     pronounce_temp = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
-    print misspell(pronounce_temp, word)
+    print(misspell(pronounce_temp, word))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -174,23 +174,23 @@ if __name__ == '__main__':
 
     not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
     if len(not_pronounced_words) > 0:
-        print 'Warning! These words are unpronounced: ' + str(not_pronounced_words)
+        print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
 
     while True:
         food = random.sample(foods, 1)[0]
         fud = misspell(pronounce, food)
         image = make_image(food, fud)
-        print "Posting %s as %s" % (food, fud)
+        print("Posting %s as %s" % (food, fud))
         try:
             post_tweet(image, fud)
         except twython.exceptions.TwythonError:
-            print "Error once, trying again."
+            print("Error once, trying again.")
             try:
                 post_tweet(image, fud)
             except:
-                print "Error twice, giving up for now."
+                print("Error twice, giving up for now.")
  
         # post ~ 2 / day? Average sleep 11 hrs so it'll rotate through the day.
         minutes_to_sleep = random.randint(460, 860)
-        print "It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60)
+        print("It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60))
         time.sleep(minutes_to_sleep * 60)
