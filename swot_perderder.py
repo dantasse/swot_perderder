@@ -53,7 +53,7 @@ phone_lookup = {
     'Z': ['Z', 'ZH', 'TH'],
     'ZH':['ZH', 'SH', 'CH'],
 }
-app = Flask(__name__)
+application = Flask(__name__)
 
 
 # Given a phone (like "IY2" or "HH") returns letters that might somehow
@@ -155,7 +155,7 @@ def quick_pronounce(word):
 
 foods = []
 prounounce = []
-@app.route("/post_meme")
+@application.route("/post_meme")
 def do_a_meme():
     food = random.sample(foods, 1)[0]
     fud = misspell(pronounce, food)
@@ -200,7 +200,7 @@ if __name__ == '__main__':
     if len(not_pronounced_words) > 0:
         print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
 
-    app.run()
+    application.run()
     # while True:
         # do_a_meme()
         # post ~ 2 / day? Average sleep 11 hrs so it'll rotate through the day.
