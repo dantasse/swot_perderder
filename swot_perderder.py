@@ -3,7 +3,9 @@
 # Every so often (TBD), takes a food, messes its name up, grabs an image of
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
-import argparse, random, ConfigParser, os, PIL, StringIO, time, datetime
+import argparse, random, os, PIL, time, datetime, math
+from io import StringIO
+from configparser import ConfigParser
 from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 from twython import Twython
@@ -84,7 +86,7 @@ def make_image(food, fud):
     img = Image.open(args.images_dir + os.sep + random.sample(possible_files, 1)[0])
 
     # find biggest font size that works
-    fontSize = img.size[1]/5
+    fontSize = math.floor(img.size[1]/5)
     font = ImageFont.truetype(IMPACT, fontSize)
     fudSize = font.getsize(fud)
     while fudSize[0] > img.size[0]-20:
@@ -110,7 +112,7 @@ def make_image(food, fud):
     draw = ImageDraw.Draw(img)
     
     # draw outlines - this is kind of slow, there may be a better way
-    outlineRange = fontSize/15
+    outlineRange = math.floor(fontSize/15)
     for x in range(-outlineRange, outlineRange+1, 2):
         for y in range(-outlineRange, outlineRange+1, 2):
             draw.text((fudPosition[0]+x, fudPosition[1]+y), fud, (0,0,0), font=font)
@@ -118,7 +120,7 @@ def make_image(food, fud):
     draw.text(fudPosition, fud, (255,255,255), font=font)
 
     # half ass watermark :P TODO make this better
-    watermarkFontSize = fontSize / 5
+    watermarkFontSize = math.floor(fontSize / 5)
     watermarkFont = ImageFont.truetype(IMPACT, watermarkFontSize)
     draw.text((5, 5), "@swot_perderder", fill=(200, 200, 200), font=watermarkFont)
 
@@ -144,7 +146,7 @@ def load_pronouncing_dict(pronouncing_dict_file):
     return pronounce
 
 def quick_pronounce(word):
-    pronounce_temp = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
+    pronounce_temp = load_pronouncing_dict("cmu_pronouncing_dict/cmudict-0.7b.txt")
     print(misspell(pronounce_temp, word))
 
 if __name__ == '__main__':
@@ -152,10 +154,10 @@ if __name__ == '__main__':
     parser.add_argument('--foods_file', default='foods.txt')
     parser.add_argument('--images_dir', default='images')
     parser.add_argument('--pronouncing_dict_file',
-        default='cmu_pronouncing_dict/cmudict-0.7b.txt')
+        default="cmu_pronouncing_dict/cmudict-0.7b.txt")
     args = parser.parse_args()
 
-    config = ConfigParser.ConfigParser()
+    config = ConfigParser()
     config.read('config.txt')
     POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
     OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
@@ -182,12 +184,12 @@ if __name__ == '__main__':
         image = make_image(food, fud)
         print("Posting %s as %s" % (food, fud))
         try:
-            print 'Would post a tweet now, but am not doing so b/c debug'
+            print('Would post a tweet now, but am not doing so b/c debug')
             # post_tweet(image, fud)
         except twython.exceptions.TwythonError:
             print("Error once, trying again.")
             try:
-                print 'Would post a tweet now, but am not doing so b/c debug'
+                print('Would post a tweet now, but am not doing so b/c debug')
                 # post_tweet(image, fud)
             except:
                 print("Error twice, giving up for now.")
