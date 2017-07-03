@@ -4,7 +4,8 @@
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
 import argparse, random, os, PIL, time, datetime, math
-from io import StringIO
+from flask import Flask
+from io import BytesIO
 from configparser import ConfigParser
 from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
@@ -52,6 +53,8 @@ phone_lookup = {
     'Z': ['Z', 'ZH', 'TH'],
     'ZH':['ZH', 'SH', 'CH'],
 }
+app = Flask(__name__)
+
 
 # Given a phone (like "IY2" or "HH") returns letters that might somehow
 # represent it in a word, in a goofy sort of way.
@@ -128,7 +131,8 @@ def make_image(food, fud):
     return img
 
 def post_tweet(image, fud):
-    image_io = StringIO.StringIO()
+    image_io = BytesIO()
+    
     image.save(image_io, format='JPEG')
     # If you do not seek(0), the image will be at the end of the file and unable to be read
     image_io.seek(0)
@@ -148,6 +152,24 @@ def load_pronouncing_dict(pronouncing_dict_file):
 def quick_pronounce(word):
     pronounce_temp = load_pronouncing_dict("cmu_pronouncing_dict/cmudict-0.7b.txt")
     print(misspell(pronounce_temp, word))
+
+foods = []
+prounounce = []
+@app.route("/post_meme")
+def do_a_meme():
+    food = random.sample(foods, 1)[0]
+    fud = misspell(pronounce, food)
+    image = make_image(food, fud)
+    print("Posting %s as %s" % (food, fud))
+    try:
+        post_tweet(image, fud)
+    except twython.exceptions.TwythonError:
+        print("Error once, trying again.")
+        try:
+            post_tweet(image, fud)
+        except:
+            print("Error twice, giving up for now.")
+    return '<html><head></head><body>Posted a tweet: '+fud+'</body></html>'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -178,21 +200,10 @@ if __name__ == '__main__':
     if len(not_pronounced_words) > 0:
         print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
 
-    while True:
-        food = random.sample(foods, 1)[0]
-        fud = misspell(pronounce, food)
-        image = make_image(food, fud)
-        print("Posting %s as %s" % (food, fud))
-        try:
-            post_tweet(image, fud)
-        except twython.exceptions.TwythonError:
-            print("Error once, trying again.")
-            try:
-                post_tweet(image, fud)
-            except:
-                print("Error twice, giving up for now.")
- 
+    app.run()
+    # while True:
+        # do_a_meme()
         # post ~ 2 / day? Average sleep 11 hrs so it'll rotate through the day.
-        minutes_to_sleep = random.randint(460, 860)
-        print("It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60))
-        time.sleep(minutes_to_sleep * 60)
+        # minutes_to_sleep = random.randint(460, 860)
+        # print("It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60))
+        # time.sleep(minutes_to_sleep * 60)
