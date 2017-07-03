@@ -184,13 +184,11 @@ if __name__ == '__main__':
         image = make_image(food, fud)
         print("Posting %s as %s" % (food, fud))
         try:
-            print('Would post a tweet now, but am not doing so b/c debug')
-            # post_tweet(image, fud)
+            post_tweet(image, fud)
         except twython.exceptions.TwythonError:
             print("Error once, trying again.")
             try:
-                print('Would post a tweet now, but am not doing so b/c debug')
-                # post_tweet(image, fud)
+                post_tweet(image, fud)
             except:
                 print("Error twice, giving up for now.")
  
