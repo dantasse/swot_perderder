@@ -17,3 +17,5 @@ The `scrape_images.py` won't work anymore because it was using an old Google
 image search API. Best bet in the future if you want to update this is to use
 [Bing](https://msdn.microsoft.com/en-us/library/dn760791(v=bsynd.50).aspx), I
 guess.
+
+Also, at one point I tried to reconfigure this as a Flask app that runs on Amazon's Elastic Beanstalk. I think that was dumb; it can just run on an EC2 free micro instance. Any references that are still around to Flask or EB can be ignored for the time being.
