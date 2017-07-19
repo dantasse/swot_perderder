@@ -89,7 +89,7 @@ def make_image(food, fud):
     img = Image.open(args.images_dir + os.sep + random.sample(possible_files, 1)[0])
 
     # find biggest font size that works
-    fontSize = math.floor(img.size[1]/5)
+    fontSize = int(math.floor(img.size[1]/5))
     font = ImageFont.truetype(IMPACT, fontSize)
     fudSize = font.getsize(fud)
     while fudSize[0] > img.size[0]-20:
@@ -115,7 +115,7 @@ def make_image(food, fud):
     draw = ImageDraw.Draw(img)
     
     # draw outlines - this is kind of slow, there may be a better way
-    outlineRange = math.floor(fontSize/15)
+    outlineRange = int(math.floor(fontSize/15))
     for x in range(-outlineRange, outlineRange+1, 2):
         for y in range(-outlineRange, outlineRange+1, 2):
             draw.text((fudPosition[0]+x, fudPosition[1]+y), fud, (0,0,0), font=font)
@@ -123,7 +123,7 @@ def make_image(food, fud):
     draw.text(fudPosition, fud, (255,255,255), font=font)
 
     # half ass watermark :P TODO make this better
-    watermarkFontSize = math.floor(fontSize / 5)
+    watermarkFontSize = int(math.floor(fontSize / 5))
     watermarkFont = ImageFont.truetype(IMPACT, watermarkFontSize)
     draw.text((5, 5), "@swot_perderder", fill=(200, 200, 200), font=watermarkFont)
 
@@ -200,10 +200,10 @@ if __name__ == '__main__':
     if len(not_pronounced_words) > 0:
         print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
 
-    application.run()
-    # while True:
-        # do_a_meme()
-        # post ~ 2 / day? Average sleep 11 hrs so it'll rotate through the day.
-        # minutes_to_sleep = random.randint(460, 860)
-        # print("It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60))
-        # time.sleep(minutes_to_sleep * 60)
+    # application.run()
+    while True:
+        do_a_meme()
+        # post ~ 1 / day? Average sleep 23 hrs so it'll rotate through the day.
+        minutes_to_sleep = random.randint(1180, 1580)
+        print("It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60))
+        time.sleep(minutes_to_sleep * 60)
