@@ -36,6 +36,7 @@ blueberry
 borscht
 boysenberry
 bran flakes
+bratwurst
 bread
 breadfruit
 breakfast
@@ -58,6 +59,7 @@ capers
 cappuccino
 caramel
 caramel apple
+carpaccio
 carrot
 carrot cake
 cashew
@@ -81,6 +83,7 @@ cherry
 chicken
 chicken and waffles
 chicken tikka masala
+chicken wings
 chick peas
 chili
 chili dog
@@ -89,6 +92,7 @@ chives
 chocolate
 chocolate chip cookie
 chocolate chips
+chocolate mousse
 chutney
 cilantro
 cinnamon
@@ -133,6 +137,7 @@ dandelion greens
 Danish pastry
 dates
 dill
+dosa
 dough
 doughnut
 dragonfruit
@@ -171,6 +176,7 @@ gelato
 ginger
 ginger ale
 gingerbread
+gnocchi
 goji berries
 Gouda cheese
 goulash
@@ -185,6 +191,7 @@ green pepper
 greens
 green tea
 grilled cheese
+grits
 guacamole
 guava
 gumbo
@@ -256,9 +263,11 @@ macaroon
 maize
 mandarin orange
 mango
+manicotti
 maple syrup
 marble rye
 margarine
+margarita
 marionberry
 marmalade
 marshmallow
@@ -285,6 +294,7 @@ mustard
 mustard greens
 mutter paneer
 mutton
+naan
 nectarine
 noodles
 nutmeg
@@ -308,6 +318,7 @@ pasta
 pastry
 pate
 patty pan squash
+pawpaw
 pea
 peach
 peanut
@@ -343,6 +354,7 @@ porridge
 potato
 potato chips
 pot roast
+poutine
 preserves
 pretzel
 prime rib
@@ -352,10 +364,12 @@ pudding
 pumpernickel
 pumpkin
 pumpkin pie
+pupusa
 quiche
 quinoa
 radish
 raisin
+rambutan
 ramen
 raspberry
 ravioli
@@ -434,6 +448,7 @@ tangerine
 tapioca
 taro
 tea
+tempura
 teriyaki
 tiramisu
 toast
@@ -442,6 +457,7 @@ tofu
 tomatillo
 tomato
 torte
+tortellini
 tortilla
 truffle
 tuna fish
@@ -449,6 +465,7 @@ tuna salad
 tuna salad sandwich
 turkey
 turnip
+udon
 ugli fruit
 vanilla
 veal
