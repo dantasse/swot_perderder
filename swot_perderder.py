@@ -4,9 +4,9 @@
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
 import argparse, random, os, PIL, time, datetime, math
-from flask import Flask
+print("hello, imported some things")
 from io import BytesIO
-from configparser import ConfigParser
+from ConfigParser import ConfigParser
 from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 from twython import Twython
@@ -53,7 +53,6 @@ phone_lookup = {
     'Z': ['Z', 'ZH', 'TH'],
     'ZH':['ZH', 'SH', 'CH'],
 }
-application = Flask(__name__)
 
 
 # Given a phone (like "IY2" or "HH") returns letters that might somehow
@@ -155,7 +154,6 @@ def quick_pronounce(word):
 
 foods = []
 prounounce = []
-@application.route("/post_meme")
 def do_a_meme():
     food = random.sample(foods, 1)[0]
     fud = misspell(pronounce, food)
@@ -173,10 +171,7 @@ def do_a_meme():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--foods_file', default='foods.txt')
     parser.add_argument('--images_dir', default='images')
-    parser.add_argument('--pronouncing_dict_file',
-        default="cmu_pronouncing_dict/cmudict-0.7b.txt")
     args = parser.parse_args()
 
     config = ConfigParser()
@@ -191,19 +186,13 @@ if __name__ == '__main__':
     twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
         OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
 
-
     # Parse food list and pronunciation dictionary
-    foods = [line.strip() for line in open(args.foods_file)]
-    pronounce = load_pronouncing_dict(args.pronouncing_dict_file)
+    foods = [line.strip() for line in open('foods.txt')]
+    pronounce = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
 
     not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
     if len(not_pronounced_words) > 0:
         print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
 
-    # application.run()
-    while True:
-        do_a_meme()
-        # post ~ 1 / day? Average sleep 23 hrs so it'll rotate through the day.
-        minutes_to_sleep = random.randint(1180, 1580)
-        print("It is now %s, sleeping for %d hours, %d minutes" % (datetime.datetime.now(), minutes_to_sleep / 60, minutes_to_sleep % 60))
-        time.sleep(minutes_to_sleep * 60)
+    do_a_meme()
+    print("Done")
