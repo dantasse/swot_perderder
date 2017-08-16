@@ -6,7 +6,7 @@
 import argparse, random, os, PIL, time, datetime, math
 print("hello, imported some things")
 from io import BytesIO
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 from twython import Twython
@@ -83,6 +83,8 @@ def make_image(food, fud):
     foodlower = food.lower().replace(' ', '_')
     print(foodlower)
     possible_files = [f for f in os.listdir(args.images_dir) if '_'.join(f.split('_')[:-1]) == foodlower]
+    # TODO possible_files should be a list of S3 locations maybe?
+
     print(possible_files)
     # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
     img = Image.open(args.images_dir + os.sep + random.sample(possible_files, 1)[0])
@@ -154,9 +156,9 @@ def quick_pronounce(word):
 
 foods = []
 prounounce = []
-def do_a_meme():
-    food = random.sample(foods, 1)[0]
-    fud = misspell(pronounce, food)
+def do_a_meme(food, fud):
+    #food = random.sample(foods, 1)[0]
+    #fud = misspell(pronounce, food)
     image = make_image(food, fud)
     print("Posting %s as %s" % (food, fud))
     try:
@@ -196,3 +198,51 @@ if __name__ == '__main__':
 
     do_a_meme()
     print("Done")
+
+import boto3
+import uuid
+from PIL import Image
+import PIL.Image
+
+s3_client = boto3.client('s3')
+
+# def resize_image(image_path, resized_path):
+#     with Image.open(image_path) as image:
+#         image.thumbnail(tuple(x / 2 for x in image.size))
+#         image.save(resized_path)
+
+def handler(event, context):
+    config = ConfigParser()
+    config.read('config.txt')
+    POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
+    OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
+                  'consumer_secret': config.get('twitter', 'consumer_secret'),
+                  'access_token_key': config.get('twitter', 'access_token_key'),
+                  'access_token_secret': config.get('twitter', 'access_token_secret')}
+
+    IMPACT = "Impact.ttf"
+    twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
+        OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
+
+    # Parse food list and pronunciation dictionary
+    global foods
+    global pronounce
+    foods = [line.strip() for line in open('foods.txt')]
+    pronounce = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
+
+    not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
+    if len(not_pronounced_words) > 0:
+        print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
+
+    food = random.sample(foods, 1)[0]
+    fud = misspell(pronounce, food)
+    do_a_meme(food, fud)
+#    for record in event['Records']:
+#        bucket = record['s3']['bucket']['name']
+#        key = record['s3']['object']['key']
+#        download_path = '/tmp/{}{}'.format(uuid.uuid4(), key)
+#        upload_path = '/tmp/resized-{}'.format(key)
+#
+#        s3_client.download_file(bucket, key, download_path)
+#        resize_image(download_path, upload_path)
+#        s3_client.upload_file(upload_path, '{}-resized'.format(bucket), key)
