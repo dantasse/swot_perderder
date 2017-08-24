@@ -128,7 +128,7 @@ def make_image(food, fud, s3_client):
     watermarkFont = ImageFont.truetype('Impact.ttf', watermarkFontSize)
     draw.text((5, 5), "@swot_perderder", fill=(200, 200, 200), font=watermarkFont)
 
-    img.save("temp.png")
+    # img.save("temp.png")
     return img
 
 def post_tweet(image, fud, twitter_client):
