@@ -3,7 +3,7 @@
 # Every so often (TBD), takes a food, messes its name up, grabs an image of
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
-import argparse, random, os, PIL, time, datetime, math
+import argparse, random, os, PIL, time, datetime, math, pprint
 print("hello, imported some things")
 from io import BytesIO
 from configparser import ConfigParser
@@ -79,23 +79,23 @@ def misspell(pronounce_dict, food):
     return ' '.join(fud)
 
 # Given a correctly-spelled word and a made-up spelling, returns a meme image.
-def make_image(food, fud):
-    foodlower = food.lower().replace(' ', '_')
-    print(foodlower)
-    possible_files = [f for f in os.listdir(args.images_dir) if '_'.join(f.split('_')[:-1]) == foodlower]
-    # TODO possible_files should be a list of S3 locations maybe?
+def make_image(food, fud, s3_client):
+    foodlower= food.lower().replace(' ', '_')
+    possible_files = [f['Key'] for f in s3_client.list_objects_v2(Bucket='swot-perderder', Prefix='images/'+foodlower)['Contents']]
+    filename = random.sample(possible_files, 1)[0]
 
-    print(possible_files)
+
     # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
-    img = Image.open(args.images_dir + os.sep + random.sample(possible_files, 1)[0])
+    obj = s3_client.get_object(Bucket='swot-perderder', Key = filename)
+    img = Image.open(obj['Body'])
 
     # find biggest font size that works
     fontSize = int(math.floor(img.size[1]/5))
-    font = ImageFont.truetype(IMPACT, fontSize)
+    font = ImageFont.truetype('Impact.ttf', fontSize)
     fudSize = font.getsize(fud)
     while fudSize[0] > img.size[0]-20:
         fontSize = fontSize - 1
-        font = ImageFont.truetype(IMPACT, fontSize)
+        font = ImageFont.truetype('Impact.ttf', fontSize)
         fudSize = font.getsize(fud)
 
     fudPositionX = (img.size[0]/2) - (fudSize[0]/2)
@@ -125,21 +125,20 @@ def make_image(food, fud):
 
     # half ass watermark :P TODO make this better
     watermarkFontSize = int(math.floor(fontSize / 5))
-    watermarkFont = ImageFont.truetype(IMPACT, watermarkFontSize)
+    watermarkFont = ImageFont.truetype('Impact.ttf', watermarkFontSize)
     draw.text((5, 5), "@swot_perderder", fill=(200, 200, 200), font=watermarkFont)
 
     img.save("temp.png")
     return img
 
-def post_tweet(image, fud):
+def post_tweet(image, fud, twitter_client):
     image_io = BytesIO()
     
     image.save(image_io, format='JPEG')
     # If you do not seek(0), the image will be at the end of the file and unable to be read
     image_io.seek(0)
     # TODO update this to use upload_media and then a separate post instead.
-    twitter.update_status_with_media(media=image_io, status='')
-    # twitter.update_status_with_media(media=image_io, status='#' + fud.lower().replace(' ', '_'))
+    twitter_client.update_status_with_media(media=image_io, status='')
 
 def load_pronouncing_dict(pronouncing_dict_file):
     pronounce = defaultdict(list) # word -> list of pronunciations, each a list of phones.
@@ -154,50 +153,47 @@ def quick_pronounce(word):
     pronounce_temp = load_pronouncing_dict("cmu_pronouncing_dict/cmudict-0.7b.txt")
     print(misspell(pronounce_temp, word))
 
-foods = []
-prounounce = []
-def do_a_meme(food, fud):
-    #food = random.sample(foods, 1)[0]
-    #fud = misspell(pronounce, food)
-    image = make_image(food, fud)
+def do_a_meme(food, fud, s3_client, twitter_client):
+    image = make_image(food, fud, s3_client)
     print("Posting %s as %s" % (food, fud))
     try:
-        post_tweet(image, fud)
+        post_tweet(image, fud, twitter_client)
     except twython.exceptions.TwythonError:
         print("Error once, trying again.")
         try:
-            post_tweet(image, fud)
+            post_tweet(image, fud, twitter_client)
         except:
             print("Error twice, giving up for now.")
     return '<html><head></head><body>Posted a tweet: '+fud+'</body></html>'
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--images_dir', default='images')
-    args = parser.parse_args()
-
-    config = ConfigParser()
-    config.read('config.txt')
-    POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
-    OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
-                  'consumer_secret': config.get('twitter', 'consumer_secret'),
-                  'access_token_key': config.get('twitter', 'access_token_key'),
-                  'access_token_secret': config.get('twitter', 'access_token_secret')}
-
-    IMPACT = "Impact.ttf"
-    twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
-        OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
-
-    # Parse food list and pronunciation dictionary
-    foods = [line.strip() for line in open('foods.txt')]
-    pronounce = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
-
-    not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
-    if len(not_pronounced_words) > 0:
-        print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
-
-    do_a_meme()
-    print("Done")
+# if __name__ == '__main__':
+#    handler(None, None)
+#    parser = argparse.ArgumentParser()
+#    parser.add_argument('--images_dir', default='images')
+#    args = parser.parse_args()
+#
+#    config = ConfigParser()
+#    config.read('config.txt')
+#    POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
+#    OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
+#                  'consumer_secret': config.get('twitter', 'consumer_secret'),
+#                  'access_token_key': config.get('twitter', 'access_token_key'),
+#                  'access_token_secret': config.get('twitter', 'access_token_secret')}
+#
+#    IMPACT = "Impact.ttf"
+#    twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
+#        OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
+#
+#    # Parse food list and pronunciation dictionary
+#    foods = [line.strip() for line in open('foods.txt')]
+#    pronounce = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
+#
+#    not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
+#    if len(not_pronounced_words) > 0:
+#        print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
+#
+#    do_a_meme()
+#    print("Done")
 
 import boto3
 import uuid
@@ -220,13 +216,10 @@ def handler(event, context):
                   'access_token_key': config.get('twitter', 'access_token_key'),
                   'access_token_secret': config.get('twitter', 'access_token_secret')}
 
-    IMPACT = "Impact.ttf"
     twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
         OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
 
     # Parse food list and pronunciation dictionary
-    global foods
-    global pronounce
     foods = [line.strip() for line in open('foods.txt')]
     pronounce = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
 
@@ -236,13 +229,7 @@ def handler(event, context):
 
     food = random.sample(foods, 1)[0]
     fud = misspell(pronounce, food)
-    do_a_meme(food, fud)
-#    for record in event['Records']:
-#        bucket = record['s3']['bucket']['name']
-#        key = record['s3']['object']['key']
-#        download_path = '/tmp/{}{}'.format(uuid.uuid4(), key)
-#        upload_path = '/tmp/resized-{}'.format(key)
-#
-#        s3_client.download_file(bucket, key, download_path)
-#        resize_image(download_path, upload_path)
-#        s3_client.upload_file(upload_path, '{}-resized'.format(bucket), key)
+    do_a_meme(food, fud, s3_client, twitter)
+
+if __name__ == '__main__':
+    handler(None, None)
