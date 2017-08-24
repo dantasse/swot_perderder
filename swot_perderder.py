@@ -11,6 +11,8 @@ from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 from twython import Twython
 import twython.exceptions
+import boto3
+
 # Lookup table to translate phones to letters.
 phone_lookup = {
     'AA':['AH', 'AW', 'AR', 'ER', 'OH'],
@@ -128,7 +130,6 @@ def make_image(food, fud, s3_client):
     watermarkFont = ImageFont.truetype('Impact.ttf', watermarkFontSize)
     draw.text((5, 5), "@swot_perderder", fill=(200, 200, 200), font=watermarkFont)
 
-    # img.save("temp.png")
     return img
 
 def post_tweet(image, fud, twitter_client):
@@ -166,48 +167,9 @@ def do_a_meme(food, fud, s3_client, twitter_client):
             print("Error twice, giving up for now.")
     return '<html><head></head><body>Posted a tweet: '+fud+'</body></html>'
 
-# if __name__ == '__main__':
-#    handler(None, None)
-#    parser = argparse.ArgumentParser()
-#    parser.add_argument('--images_dir', default='images')
-#    args = parser.parse_args()
-#
-#    config = ConfigParser()
-#    config.read('config.txt')
-#    POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
-#    OAUTH_KEYS = {'consumer_key': config.get('twitter', 'consumer_key'),
-#                  'consumer_secret': config.get('twitter', 'consumer_secret'),
-#                  'access_token_key': config.get('twitter', 'access_token_key'),
-#                  'access_token_secret': config.get('twitter', 'access_token_secret')}
-#
-#    IMPACT = "Impact.ttf"
-#    twitter = Twython(OAUTH_KEYS['consumer_key'], OAUTH_KEYS['consumer_secret'],
-#        OAUTH_KEYS['access_token_key'], OAUTH_KEYS['access_token_secret'])
-#
-#    # Parse food list and pronunciation dictionary
-#    foods = [line.strip() for line in open('foods.txt')]
-#    pronounce = load_pronouncing_dict('cmu_pronouncing_dict/cmudict-0.7b.txt')
-#
-#    not_pronounced_words = [w for w in foods if w.split()[0].upper() not in pronounce]
-#    if len(not_pronounced_words) > 0:
-#        print('Warning! These words are unpronounced: ' + str(not_pronounced_words))
-#
-#    do_a_meme()
-#    print("Done")
-
-import boto3
-import uuid
-from PIL import Image
-import PIL.Image
-
-s3_client = boto3.client('s3')
-
-# def resize_image(image_path, resized_path):
-#     with Image.open(image_path) as image:
-#         image.thumbnail(tuple(x / 2 for x in image.size))
-#         image.save(resized_path)
-
+# Just drops |event| and |context| for now.
 def handler(event, context):
+    s3_client = boto3.client('s3')
     config = ConfigParser()
     config.read('config.txt')
     POST_URL = 'https://api.twitter.com/1.1/statuses/update.json'
