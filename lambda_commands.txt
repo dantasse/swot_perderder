@@ -1,0 +1,15 @@
+aws lambda create-function \
+--region us-west-2 \
+--function-name swot_perderder \
+--zip-file fileb:///home/ec2-user/swot_perderder/swot_perderder.zip \
+--role arn:aws:iam::(IAM role name) \
+--handler swot_perderder.handler \
+--runtime python3.6 \
+--profile adminuser \
+--timeout 10 \
+--memory-size 1024
+
+aws lambda update-function-code \
+--function-name swot_perderder \
+--zip-file fileb:///home/ec2-user/swot_perderder/swot_perderder.zip
+

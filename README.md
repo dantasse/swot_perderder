@@ -22,4 +22,21 @@ guess.
 AWS Lambda can use.
 Then I used [this](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python) to install python on an AWS amazon linux machine in order to compile Pillow.
 
-Also, at one point I tried to reconfigure this as a Flask app that runs on Amazon's Elastic Beanstalk. I think that was dumb; it can just run on an EC2 free micro instance. Any references that are still around to Flask or EB can be ignored for the time being.
+If I need to edit this code, I should:
+
+- spin up an EC2 machine
+- use the link above to install python on it
+- make a `~/.aws/credentials` file on it that looks like this:
+
+    [default]
+    aws_access_key_id = (access key)
+    aws_secret_access_key = (secret key)
+
+- read [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html) a bunch to remember how to do everything
+- make sure I've still got the `adminuser` role [here](https://console.aws.amazon.com/iam/home?#/users)
+- make a deployment package as [here](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html) or use `make_archive.sh`
+- use the `lambda_commands.txt` to run update-function-code ([relevant docs, sort of](http://boto3.readthedocs.io/en/latest/reference/services/lambda.html#Lambda.Client.update_function_code))
+
+How does Lambda know I'm authorized to access S3? Because of the role that I created the function under. And I think I can do that because I had the ~/.aws/credentials file on my AWS machine.
+
+When is it running? See [triggers](https://us-west-2.console.aws.amazon.com/lambda/home?region=us-west-2#/functions/swot_perderder?tab=triggers).

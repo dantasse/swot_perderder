@@ -3,8 +3,7 @@
 # Every so often (TBD), takes a food, messes its name up, grabs an image of
 # that food, and makes a meme with the misspelled word, posts it to Twitter.
 
-import argparse, random, os, PIL, time, datetime, math, pprint
-print("hello, imported some things")
+import random, PIL, math
 from io import BytesIO
 from configparser import ConfigParser
 from PIL import Image, ImageFont, ImageDraw
