@@ -1,4 +1,4 @@
-"Swot Perderder" generator - misspelled foods.
+# "Swot Perderder" generator
 
 Picks a random food, finds a picture of it, overlays text of a misspelled
 version of that food, posts it to twitter.
@@ -28,10 +28,11 @@ If I need to edit this code, I should:
 - use the link above to install python on it
 - make a `~/.aws/credentials` file on it that looks like this:
 
+```
     [default]
     aws_access_key_id = (access key)
     aws_secret_access_key = (secret key)
-
+```
 - read [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html) a bunch to remember how to do everything
 - make sure I've still got the `adminuser` role [here](https://console.aws.amazon.com/iam/home?#/users)
 - make a deployment package as [here](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html) or use `make_archive.sh`
