@@ -20,20 +20,20 @@ guess.
 
 `make_archive.sh` is a script that turns this directory into an archive that
 AWS Lambda can use.
-Then I used [this](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python) to install python on an AWS amazon linux machine in order to compile Pillow.
+Then I used [this](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html#with-s3-example-deployment-pkg-python) to install python on an AWS amazon linux machine in order to compile Pillow. (I think I had to compile pillow because it uses native code or something? There's a bit [here](https://docs.aws.amazon.com/lambda/latest/dg/python-package.html#python-package-create-package-with-dependency) about "if your deployment package contains native libraries you can use SAM Build" so maybe I'd look into that too.
 
 If I need to edit this code, I should:
 
 - spin up an EC2 machine
 - use the link above to install python on it
-- make a `~/.aws/credentials` file on it that looks like this:
+- make a `~/.aws/credentials` file on it. I can get that from my old computer or lastpass (aws_credentials.txt). It looks like this:
 
 ```
     [default]
     aws_access_key_id = (access key)
     aws_secret_access_key = (secret key)
 ```
-- read [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html) a bunch to remember how to do everything
+- read [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example.html) a bunch to remember how to do everything. Also [this](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python.html).
 - make sure I've still got the `adminuser` role [here](https://console.aws.amazon.com/iam/home?#/users)
 - make a deployment package as [here](https://docs.aws.amazon.com/lambda/latest/dg/with-s3-example-deployment-pkg.html) or use `make_archive.sh`
 - use the `lambda_commands.txt` to run update-function-code ([relevant docs, sort of](http://boto3.readthedocs.io/en/latest/reference/services/lambda.html#Lambda.Client.update_function_code))
