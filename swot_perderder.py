@@ -11,6 +11,7 @@ from collections import defaultdict
 from twython import Twython
 import twython.exceptions
 import boto3
+import os
 
 # Lookup table to translate phones to letters.
 phone_lookup = {
@@ -80,15 +81,22 @@ def misspell(pronounce_dict, food):
     return ' '.join(fud)
 
 # Given a correctly-spelled word and a made-up spelling, returns a meme image.
-def make_image(food, fud, s3_client):
+def make_image(food, fud, s3_client=None):
     foodlower= food.lower().replace(' ', '_')
-    possible_files = [f['Key'] for f in s3_client.list_objects_v2(Bucket='swot-perderder', Prefix='images/'+foodlower)['Contents']]
+    if s3_client:
+        possible_files = [f['Key'] for f in s3_client.list_objects_v2(Bucket='swot-perderder', Prefix='images/'+foodlower)['Contents']]
+    else:
+        possible_files = [filename for filename in os.listdir('images/') if filename.startswith(foodlower)]
+    
     filename = random.sample(possible_files, 1)[0]
 
 
     # A lot of this cribbed from https://github.com/danieldiekmeier/memegenerator
-    obj = s3_client.get_object(Bucket='swot-perderder', Key = filename)
-    img = Image.open(obj['Body'])
+    if s3_client:
+        obj = s3_client.get_object(Bucket='swot-perderder', Key = filename)
+        img = Image.open(obj['Body'])
+    else:
+        img = Image.open(f"images/{filename}")
 
     # find biggest font size that works
     fontSize = int(math.floor(img.size[1]/5))
