@@ -139,6 +139,11 @@ def make_image(food, fud, s3_client=None):
 
     return img
 
+def make_and_save_image(food, fud, s3_client=None):
+    image = make_image(food, fud, s3_client)
+    image.save(f'{food}.jpg', format='JPEG')
+
+
 def post_tweet(image, fud, twitter_client):
     image_io = BytesIO()
     
